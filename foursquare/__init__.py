@@ -22,6 +22,7 @@ try:
 except ImportError:
     pass
 
+from rate_limiter import RateLimiter
 
 
 
@@ -129,7 +130,7 @@ class Foursquare(object):
                 params=urllib.urlencode(data))
             log.debug(u'GET: {0}'.format(url))
             # Get the response from the token uri and attempt to parse
-            response = _request_with_retry(url)
+            response, _ = _request_with_retry(url)
             return response.get('access_token')
 
 
@@ -142,6 +143,7 @@ class Foursquare(object):
             self.set_token(access_token)
             self.version = version if version else API_VERSION
             self.multi_requests = list()
+            self.rate_limiter = RateLimiter()
 
         def set_token(self, access_token):
             """Set the OAuth token for this requester"""
@@ -191,13 +193,20 @@ class Foursquare(object):
                 params['oauth_token'] = self.oauth_token
             return params
 
+        def _update_rate_limit(self, response):
+            if 'x-ratelimit-remaining' in response and \
+                'x-ratelimit-limit' in response:
+                self.rate_limiter.update(int(response.get('x-ratelimit-limit')), int(response.get('x-ratelimit-remaining')))
+
         def _request(self, url, data=None):
             """Performs the passed request and returns meaningful data"""
             log.debug(u'{method} url: {url}{data}'.format(
                 method='POST' if data else 'GET',
                 url=url,
                 data=u'* {0}'.format(data) if data else u''))
-            return _request_with_retry(url, data)['response']
+            data, response = _request_with_retry(url, data)
+            self._update_rate_limit(response)
+            return data['response']
 
 
     class _Endpoint(object):
@@ -701,7 +710,9 @@ def _request_with_retry(url, data=None):
         time.sleep(1)
 
 def _process_request_with_httplib2(url, data=None):
-    """Make the request and handle exception processing"""
+    """Make the request and handle exception processing
+    Returns a tuple: `(data, http_response_object)`
+    """
     h = httplib2.Http()
     try:
         if data:
@@ -715,8 +726,8 @@ def _process_request_with_httplib2(url, data=None):
         data = _json_to_data(body)
         # Default case, Got proper response
         if response.status == 200:
-            return data
-        return _check_response(data)
+            return (data, response)
+        return (_check_response(data), response)
     except httplib2.HttpLib2Error, e:
         log.error(e)
         raise FoursquareException(u'Error connecting with foursquare API')

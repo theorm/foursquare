@@ -22,7 +22,7 @@ try:
 except ImportError:
     pass
 
-from rate_limiter import RateLimiter
+from rate_limiter import SlidingWindowLimiter
 
 
 
@@ -143,7 +143,7 @@ class Foursquare(object):
             self.set_token(access_token)
             self.version = version if version else API_VERSION
             self.multi_requests = list()
-            self.rate_limiter = RateLimiter(ignore_equals=True)
+            self.rate_limiter = SlidingWindowLimiter(ignore_equals=True)
 
         def set_token(self, access_token):
             """Set the OAuth token for this requester"""

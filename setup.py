@@ -27,6 +27,7 @@ setup(
         'License :: OSI Approved :: MIT License',
         ],
     packages=find_packages(),
+    package_data={'foursquare': ['*.pem']},
     install_requires=[
         'httplib2',
         'poster'

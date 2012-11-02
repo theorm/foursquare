@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 # (c) 2012 Mike Lewis
 import logging; log = logging.getLogger(__name__)
+import os
 
 try:
     import simplejson as json
@@ -43,6 +44,8 @@ NUM_REQUEST_RETRIES = 3
 # Max number of sub-requests per multi request
 MAX_MULTI_REQUESTS = 5
 
+# Foursquare certificate is verified by DigiCert
+CERT_FILENAME = 'DigiCertHighAssuranceEVRootCA.pem'
 
 # Generic foursquare exception
 class FoursquareException(Exception): pass
@@ -713,7 +716,9 @@ def _process_request_with_httplib2(url, data=None):
     """Make the request and handle exception processing
     Returns a tuple: `(data, http_response_object)`
     """
-    h = httplib2.Http()
+
+    cert_file = '{0}/{1}'.format(os.path.dirname(__file__), CERT_FILENAME)
+    h = httplib2.Http(ca_certs=cert_file)
     try:
         if data:
             datagen, headers = poster.encode.multipart_encode(data)

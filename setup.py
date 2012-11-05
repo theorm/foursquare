@@ -2,12 +2,12 @@
 # -*- coding: UTF-8 -*-
 # (c) 2012 Mike Lewis
 
-from setuptools import setup, find_packages
+from setuptools import setup
 
 #import foursquare
 #version = str(foursquare.__version__)
-# rl- stands for rate limiter, 2 for version increment
-version = 'rl20120716-2'
+# rl- stands for rate limiter, -x for version increment
+version = 'rl20120716-3'
 
 setup(
     name='foursquare',
@@ -27,7 +27,7 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'License :: OSI Approved :: MIT License',
         ],
-    packages=find_packages(),
+    packages=['foursquare'],
     package_data={'foursquare': ['*.pem']},
     install_requires=[
         'httplib2',

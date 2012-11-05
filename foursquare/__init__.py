@@ -718,7 +718,10 @@ def _process_request_with_httplib2(url, data=None):
     """
 
     cert_file = os.path.join(os.path.dirname(__file__), CERT_FILENAME)
-    h = httplib2.Http(ca_certs=cert_file)
+    # h = httplib2.Http(ca_certs=cert_file)
+    # disabling certificate checking for now until we find out why
+    # it does not work all the time
+    h = httplib2.Http(disable_ssl_certificate_validation=True)
     try:
         if data:
             datagen, headers = poster.encode.multipart_encode(data)

@@ -717,8 +717,9 @@ def _process_request_with_httplib2(url, data=None):
     Returns a tuple: `(data, http_response_object)`
     """
 
-    cert_file = '{0}/{1}'.format(os.path.dirname(__file__), CERT_FILENAME)
-    h = httplib2.Http(ca_certs=cert_file)
+    # cert_file = '{0}/{1}'.format(os.path.dirname(__file__), CERT_FILENAME)
+    # h = httplib2.Http(ca_certs=cert_file)
+    h = httplib2.Http()
     try:
         if data:
             datagen, headers = poster.encode.multipart_encode(data)

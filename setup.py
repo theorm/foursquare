@@ -6,7 +6,8 @@ from setuptools import setup, find_packages
 
 #import foursquare
 #version = str(foursquare.__version__)
-version = 'rl20120716-1'
+# rl- stands for rate limiter, 2 for version increment
+version = 'rl20120716-2'
 
 setup(
     name='foursquare',
